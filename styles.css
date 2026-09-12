@@ -114,6 +114,12 @@ a { color: inherit; }
 html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-h) + 20px);
+  /* Además del "overflow-x:hidden" de ".body" de acá abajo: en algunos
+     celulares, un elemento decorativo posicionado justo en el borde
+     puede agrandar el ancho de la página igual, aunque el body lo
+     recorte visualmente. Ponerlo también acá, en el html, es el
+     refuerzo estándar para que eso no pase. */
+  overflow-x: hidden;
 }
 body {
   background: var(--algodon);
@@ -398,10 +404,26 @@ summary:focus-visible, [tabindex]:focus-visible {
 .planta-fija--hero { left: -12%; bottom: -8%; transform: rotate(-11deg); }
 
 /* El resto de las plantas fijas, cada una atada a la foto o sección que
-   le sirve de ancla (buscá ".foto-planta" en el html de esa foto). */
+   le sirve de ancla (buscá ".foto-planta" en el html de esa foto).
+   Las que asoman hacia la IZQUIERDA no dan problema: en el celular esa
+   foto ya arranca pegada al borde izquierdo del todo, así que asomar un
+   poco más allá no cambia nada. Las que asoman hacia la DERECHA sí son
+   un problema en el celular: esa misma foto, angosta, ocupa casi todo
+   el ancho de la pantalla, así que un asomo del 10-12% se pasa del
+   borde de verdad — eso hacía que el celular renderizara como si la
+   pantalla fuera más ancha de lo que es (el "espacio de más" que se
+   notaba). Por eso las que asoman a la derecha quedan ocultas hasta
+   620px, donde ya hay margen real de sobra para que asomen sin problema. */
+.rama-fija--nosotros-foto,
+.aloe-fija--materiales {
+  display: none;
+}
 .rama-fija--nosotros-foto { right: -12%; bottom: -8%; transform: rotate(12deg); }
 .aloe-fija--historia { left: -14%; bottom: -8%; transform: rotate(-9deg); width: clamp(120px, 32%, 200px); }
 .aloe-fija--materiales { right: -10%; top: -4%; transform: rotate(11deg); width: clamp(130px, 30%, 210px); }
+@media (min-width: 620px) {
+  .rama-fija--nosotros-foto, .aloe-fija--materiales { display: block; }
+}
 .rama-fija--destacados {
   left: 0; bottom: -1%; transform: rotate(-9deg); display: none;
 }
