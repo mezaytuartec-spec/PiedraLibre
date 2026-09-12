@@ -1115,8 +1115,13 @@
         })
           .then(function (r) { return r.json(); })
           .then(function (data) {
-            if (data && (data.init_point || data.sandbox_init_point)) {
-              window.location.href = data.sandbox_init_point || data.init_point;
+            /* Mercado Pago siempre manda dos links: "init_point" (el de
+               verdad) y "sandbox_init_point" (uno de prueba, que existe
+               siempre, incluso con las credenciales reales). Usar el de
+               verdad es lo que corresponde acá — el carrito no tiene
+               ningún modo de prueba propio. */
+            if (data && data.init_point) {
+              window.location.href = data.init_point;
             } else {
               throw new Error('sin init_point');
             }
