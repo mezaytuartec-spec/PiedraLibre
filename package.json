@@ -1,0 +1,11 @@
+{
+  "name": "piedra-libre",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Piedra Libre — sitio estático (HTML/CSS/JS) + 2 funciones chicas en /api para Mercado Pago. Se despliega en Vercel: los archivos sueltos se sirven tal cual y /api/*.js se ejecuta como función.",
+  "dependencies": {
+    "mercadopago": "^3.6.1",
+    "nodemailer": "^10.0.9"
+  }
+}

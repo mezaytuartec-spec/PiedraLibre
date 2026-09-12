@@ -1,0 +1,1219 @@
+/* ============================================================================
+   PIEDRA LIBRE · LOS MOLLES
+   Concepto: RECORTE Y COSTURA. Bloques recortados, puntadas, sombras duras.
+   ============================================================================ */
+
+/* ============================================================================
+   0. TIPOGRAFÍA DE ETIQUETA — "Lets get crazy sans"
+   ----------------------------------------------------------------------------
+   ⚠ DOS COSAS IMPORTANTES ANTES DE PUBLICAR:
+
+   1) LICENCIA. El archivo es la versión "free personal use" de Pedro Teixeira
+      (MyFonts). Una tienda es uso comercial, así que hay que comprar la
+      licencia comercial antes de subir el sitio. Si no la vas a comprar,
+      borrá este bloque @font-face y listo: todo sigue funcionando con Inter.
+      https://www.myfonts.com/foundry/Pedro_Teixeira/
+
+   2) NO TIENE ACENTOS NI Ñ. Son 70 glifos: A-Z, a-z, 0-9 y poco más.
+      Sin la red de seguridad de abajo, "BEBÉS" perdería la É y "NIÑAS" la Ñ.
+      Por eso el unicode-range la limita a los caracteres que sí existen:
+      cualquier letra acentuada cae sola en Inter y nunca desaparece.
+      Es también el motivo por el que la usamos sólo en etiquetas cortas
+      y no en los títulos ni en los textos largos.
+   ============================================================================ */
+@font-face {
+  font-family: 'Cintas';
+  src: url('assets/fonts/lets-get-crazy-sans.ttf?v=20260915') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  /* Sólo lo que la fuente realmente trae: básico latino sin acentos */
+  unicode-range: U+0020-007E;
+}
+
+/* ---------------------------------------------------------------- 1. RESET */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body, h1, h2, h3, h4, p, figure, blockquote, dl, dd, ul, ol { margin: 0; }
+ul[class], ol[class] { list-style: none; padding: 0; }
+img, svg, iframe { display: block; max-width: 100%; }
+img { height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+a { color: inherit; }
+
+/* --------------------------------------------------------------- 2. TOKENS */
+:root {
+  /* Paleta */
+  --algodon: #FFFFFF;
+  --arena:   #F0E7D6;
+  --papel:   #FFFFFF;
+  --tinta:   #221F1A;
+  --tinta-2: #4A443C;
+  --tinta-3: #6F6659;   /* 5,2:1 sobre el fondo crudo — cumple AA en texto chico */
+
+  /* COLORES REALES DE LA MARCA
+     Sacados con cuentagotas del isotipo y del logo completo, no inventados:
+       #F95850  el rojo del círculo del gato
+       #97D019  el verde del botón de costura
+       #FFC700  el amarillo de las cintas y de las rayas del logo
+       #262223  el negro del gato (≈ el --tinta que ya teníamos) */
+  --zorro:   #F95850;   /* coral de marca — bloques, sombras, decoración */
+  --lima:    #97D019;
+  --amarillo:#FFC700;
+  --fucsia:  #D13F76;
+  --monte:   #97D019;   /* categoría Niños: el lima de marca */
+  --sol:     #FFC700;   /* categoría Bebés: el amarillo de marca */
+  --violeta: #7A4A9E;
+  --cielo:   #2E63A8;
+
+  /* CONTRASTE
+     Los colores vivos de arriba son para BLOQUES: sombras, cintas, puntos,
+     el sello, los bordes de la tira. En texto chico y en fondos de botón no
+     llegan a AA, así que para eso se usan estas versiones oscurecidas.
+     --zorro-medio es el coral apenas bajado para que las palabras en itálica
+     de los títulos grandes lleguen a 3,7:1 (AA en texto grande). */
+  --zorro-medio:  #E8453C;   /* sobre crudo:   3,7:1 — sólo títulos grandes */
+  --zorro-texto:  #C4341F;   /* blanco encima: 5,4:1 */
+  --monte-texto:  #35662A;   /* blanco encima: 6,8:1 */
+  --fucsia-texto: #C0326B;   /* sobre blanco:  5,4:1 */
+  --sol-texto:    #8A5A00;   /* sobre blanco:  5,9:1 */
+
+  /* Tintes al 13% para el rayado de los placeholders */
+  --t-zorro:   rgba(249, 88, 80, .13);
+  --t-fucsia:  rgba(209, 63, 118, .13);
+  --t-monte:   rgba(151, 208, 25, .16);
+  --t-sol:     rgba(255, 199, 0, .16);
+  --t-violeta: rgba(122, 74, 158, .13);
+  --t-tinta:   rgba(34, 31, 26, .10);
+
+  /* Tipografía fluida — TODOS los tamaños salen de acá */
+  --fs-xs:   clamp(0.70rem, 0.66rem + 0.18vw, 0.80rem);
+  --fs-sm:   clamp(0.81rem, 0.77rem + 0.20vw, 0.92rem);
+  --fs-base: clamp(0.95rem, 0.91rem + 0.24vw, 1.06rem);
+  --fs-md:   clamp(1.04rem, 0.97rem + 0.38vw, 1.22rem);
+  --fs-lg:   clamp(1.22rem, 1.08rem + 0.68vw, 1.58rem);
+  --fs-xl:   clamp(1.55rem, 1.26rem + 1.35vw, 2.35rem);
+  --fs-2xl:  clamp(1.95rem, 1.48rem + 2.30vw, 3.30rem);
+  --fs-3xl:  clamp(2.35rem, 1.60rem + 3.50vw, 4.40rem);
+
+  --ff-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --ff-texto:   'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  /* Etiquetas cortas. Inter va detrás y cubre los acentos que la otra no tiene. */
+  --ff-cinta:   'Cintas', 'Inter', system-ui, sans-serif;
+
+  /* Medidas */
+  --nav-h: 68px;
+  --ancho: 1220px;
+  --gutter: clamp(1rem, 4vw, 2.6rem);
+  --r: 4px;                 /* radio: casi recto, como un recorte de tijera */
+  --puntada: 2px dashed var(--tinta);
+}
+
+/* ------------------------------------------------------------ 3. ESTRUCTURA */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 20px);
+}
+body {
+  background: var(--algodon);
+  color: var(--tinta);
+  font-family: var(--ff-texto);
+  font-size: var(--fs-base);
+  font-weight: 400;
+  line-height: 1.62;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { width: 100%; max-width: var(--ancho); margin-inline: auto; padding-inline: var(--gutter); }
+.seccion { padding-block: clamp(3.2rem, 8vw, 6.4rem); position: relative; isolation: isolate; }
+.seccion--arena { background: var(--arena); }
+.seccion--tinta { background: var(--tinta); color: var(--algodon); }
+
+.solo-lectores {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ----------------------------------------------------------- 4. TIPOGRAFÍA */
+h1, h2, h3, .display {
+  font-family: var(--ff-display);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  text-wrap: balance;
+}
+h1 { font-size: var(--fs-3xl); }
+h2 { font-size: var(--fs-2xl); }
+h3 { font-size: var(--fs-lg); }
+
+.it {
+  font-style: italic;
+  color: var(--zorro-medio);   /* el coral puro se queda en 2,98:1 y no pasa AA */
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+}
+.seccion--tinta .it { color: var(--sol); }
+
+/* Los ojales llevan la tipografía de etiqueta: fina y condensada, sube un
+   escalón de tamaño porque a igual cuerpo se lee más chica que Inter. */
+.ojal {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--tinta-2);
+  display: inline-flex; align-items: center; gap: .55rem;
+}
+.ojal::before {
+  content: ''; width: 26px; height: 2px; background: var(--zorro); flex: none;
+}
+.seccion--tinta .ojal { color: #B9B0A2; }
+
+.bajada { font-size: var(--fs-md); color: var(--tinta-2); max-width: 56ch; }
+.seccion--tinta .bajada { color: #CFC7B9; }
+
+.cabecera-seccion { max-width: 62ch; margin-bottom: clamp(1.8rem, 4vw, 2.8rem); }
+.cabecera-seccion h2 { margin-block: .55rem .7rem; }
+
+/* --------------------------------------------------------------- 5. BOTONES */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font-family: var(--ff-texto);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.1;
+  padding: .85rem 1.35rem;
+  border: 2px solid var(--tinta);
+  border-radius: var(--r);
+  background: var(--papel);
+  color: var(--tinta);
+  text-decoration: none;
+  box-shadow: 4px 4px 0 0 var(--tinta);
+  transition: transform .14s ease, box-shadow .14s ease, background-color .14s ease;
+}
+.btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--tinta); }
+.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 0 var(--tinta); }
+/* El "display:inline-flex" de arriba pisa el "display:none" que el
+   navegador le pone por defecto a [hidden] (misma especificidad, pero
+   esta hoja carga después) — sin esto, un botón escondido con
+   ".hidden = true" desde JS se seguiría viendo. */
+.btn[hidden] { display: none; }
+/* Los botones sólidos usan las variantes oscuras: el naranja y el verde vivos
+   con texto blanco encima no llegan a AA en un tamaño de botón. */
+.btn--zorro { background: var(--zorro-texto); color: #fff; }
+.btn--monte { background: var(--monte-texto); color: #fff; }
+.btn--sol   { background: var(--sol);   color: var(--tinta); }
+.btn--claro { background: var(--algodon); }
+.btn--fantasma { background: transparent; box-shadow: none; }
+.btn--fantasma:hover { background: var(--papel); transform: none; }
+.seccion--tinta .btn { border-color: var(--algodon); box-shadow: 4px 4px 0 0 var(--sol); }
+.seccion--tinta .btn--zorro { box-shadow: 4px 4px 0 0 var(--algodon); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+
+.enlace-flecha {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-weight: 600; font-size: var(--fs-sm);
+  text-decoration: none;
+  border-bottom: 2px solid var(--zorro);
+  padding-bottom: 2px;
+  transition: gap .14s ease;
+}
+.enlace-flecha:hover { gap: .8rem; }
+
+/* Foco visible en todo lo interactivo */
+a:focus-visible, button:focus-visible, iframe:focus-visible,
+summary:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--cielo);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.seccion--tinta a:focus-visible, .seccion--tinta button:focus-visible { outline-color: var(--sol); }
+
+/* ------------------------------------------------------ 6. LÍNEAS DE PUNTADA */
+.puntada-h {
+  border: 0; border-top: var(--puntada); opacity: .38; margin: 0;
+}
+
+/* ------------------------------------------------------------ 7. NAVEGACIÓN */
+.nav {
+  position: sticky; top: 0; z-index: 60;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.nav.is-solid {
+  background: var(--algodon);
+  border-bottom-color: var(--tinta);
+}
+.nav__in {
+  min-height: var(--nav-h);
+  display: flex; align-items: center; gap: 1rem;
+}
+/* Lockup de marca: isotipo real + logotipo real.
+   El logotipo es imagen, así que lleva alto fijo y el ancho sale solo de la
+   proporción — así nunca empuja el layout mientras carga. */
+.logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; flex: none; }
+.logo__sello {
+  width: clamp(34px, 3.4vw, 42px); height: clamp(34px, 3.4vw, 42px);
+  flex: none; border-radius: 50%;
+}
+.logo__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+.logo__nombre {
+  display: block; width: auto;
+  height: clamp(15px, 1.5vw, 19px);
+  /* El logotipo viene en tinta; sobre la sección oscura se cambia el archivo */
+}
+.logo__sub {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-xs); letter-spacing: .2em; text-transform: uppercase;
+  color: var(--tinta-3); font-weight: 400; line-height: 1;
+}
+
+.nav__links { display: flex; align-items: center; gap: clamp(.6rem, 1.6vw, 1.5rem); margin-left: auto; }
+.nav__links > a {
+  text-decoration: none; font-size: var(--fs-sm); font-weight: 600;
+  padding: .4rem .1rem; position: relative;
+}
+.nav__links > a::after {
+  content: ''; position: absolute; left: 0; right: 100%; bottom: 0;
+  height: 2px; background: var(--zorro); transition: right .18s ease;
+}
+.nav__links > a:hover::after,
+.nav__links > a[aria-current="page"]::after { right: 0; }
+.nav__wa { margin-left: clamp(.2rem, 1vw, .7rem); }
+.nav__wa .btn { padding: .58rem 1rem; }
+
+.hamb {
+  display: none; margin-left: auto;
+  width: 46px; height: 42px;
+  border: 2px solid var(--tinta); border-radius: var(--r);
+  background: var(--papel);
+  box-shadow: 3px 3px 0 0 var(--tinta);
+  align-items: center; justify-content: center;
+}
+.hamb__b, .hamb__b::before, .hamb__b::after {
+  content: ''; display: block; width: 20px; height: 2px; background: var(--tinta);
+  transition: transform .18s ease, opacity .18s ease;
+}
+.hamb__b::before { transform: translateY(-6px); }
+.hamb__b::after  { transform: translateY(4px); }
+.hamb[aria-expanded="true"] .hamb__b { background: transparent; }
+.hamb[aria-expanded="true"] .hamb__b::before { transform: rotate(45deg); }
+.hamb[aria-expanded="true"] .hamb__b::after  { transform: rotate(-45deg) translateY(-1px); }
+
+/* --------------------------------------------------------------- 8. HERO */
+.hero { position: relative; padding-top: clamp(1.6rem, 5vw, 3.4rem); padding-bottom: 0; }
+.hero__grid {
+  display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3.4rem);
+  align-items: center;
+}
+.hero h1 { margin-block: .7rem 1rem; }
+.hero__botones { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.6rem; }
+
+/* El logotipo hace de título. Va recortado al trazo real, así que su borde
+   izquierdo cae exactamente sobre el de los textos y no queda flotando.
+   line-height:0 saca el interlineado fantasma que deja un <img> dentro de un
+   bloque de texto: sin eso el aire de abajo no coincide con el del resto. */
+.hero__marca {
+  line-height: 0;
+  margin-block: clamp(1rem, 2.4vw, 1.6rem) clamp(1rem, 2.2vw, 1.4rem);
+}
+.hero__marca img {
+  display: block;
+  width: min(100%, 31rem);
+  height: auto;
+}
+/* El logo "salta" al pasar el mouse: un empujoncito con un poco de
+   estiramiento (squash & stretch), como si el título se sacudiera de
+   la alegría. Dispara la clase ".is-saltando" (main.js, al entrar el
+   mouse) en vez de ":hover", para que la animación termine completa
+   aunque el mouse ya se haya ido antes de los 0,7s. Sólo con mouse: en
+   touch no hay hover que lo dispare. */
+@media (hover: hover) and (pointer: fine) {
+  .hero__marca.is-saltando img { animation: logo-salto .7s cubic-bezier(.34, 1.56, .64, 1); }
+}
+@keyframes logo-salto {
+  0%   { transform: translateY(0) scale(1, 1); }
+  25%  { transform: translateY(-22px) scale(1.05, .93); }
+  45%  { transform: translateY(0) scale(.95, 1.08); }
+  65%  { transform: translateY(-8px) scale(1.02, .97); }
+  85%  { transform: translateY(0) scale(.99, 1.01); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+.hero__lema {
+  font-family: var(--ff-display);
+  font-weight: 600;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: var(--fs-xl);
+  line-height: 1.14;
+  letter-spacing: -.015em;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.hero__lema + .bajada { margin-top: .85rem; }
+
+.datos-fila {
+  display: flex; flex-wrap: wrap; gap: 0;
+  margin-top: clamp(1.6rem, 4vw, 2.4rem);
+  border-top: var(--puntada);
+  padding-top: 1.1rem;
+}
+.datos-fila li {
+  font-size: var(--fs-sm); font-weight: 600; color: var(--tinta-2);
+  padding: .18rem clamp(.7rem, 2vw, 1.1rem);
+  border-right: var(--puntada);
+}
+.datos-fila li:first-child { padding-left: 0; }
+.datos-fila li:last-child { border-right: 0; }
+
+/* Una sola foto en el hero, apenas rotada y con sombra dura — como una
+   Polaroid cosida a la página. Antes había una segunda foto de detalle
+   superpuesta; se sacó para que esta respire más y se lea más grande. */
+.pila { position: relative; isolation: isolate; }
+.pila__unica {
+  transform: rotate(-1.6deg);
+  max-width: 30rem;
+  margin-inline: auto;
+  box-shadow: 10px 10px 0 0 var(--fucsia);
+}
+@media (min-width: 620px) { .pila__unica { max-width: 34rem; } }
+@media (min-width: 880px) { .pila__unica { max-width: none; width: 100%; } }
+
+/* Aloe y ramas de algarrobo agazapadas detrás de fotos y secciones,
+   siempre visibles (no dependen del mouse): el mismo truco de apilado
+   de las tarjetas de producto, pero fijo, como firma discreta de "esto
+   es del monte". Repartidas por la página con criterio de diseño, no
+   una por cada elemento — grandes y con confianza, no tímidas.
+   ".foto-planta" es el wrapper (agrega el contexto de apilado) que se
+   pone alrededor de una foto puntual cuando esa foto es el ancla. */
+.foto-planta { position: relative; isolation: isolate; }
+.planta-fija {
+  position: absolute; z-index: -1;
+  width: clamp(150px, 38%, 280px); height: auto;
+  pointer-events: none; user-select: none;
+}
+.planta-fija--hero { left: -12%; bottom: -8%; transform: rotate(-11deg); }
+
+/* El resto de las plantas fijas, cada una atada a la foto o sección que
+   le sirve de ancla (buscá ".foto-planta" en el html de esa foto). */
+.rama-fija--nosotros-foto { right: -12%; bottom: -8%; transform: rotate(12deg); }
+.aloe-fija--historia { left: -14%; bottom: -8%; transform: rotate(-9deg); width: clamp(120px, 32%, 200px); }
+.aloe-fija--materiales { right: -10%; top: -4%; transform: rotate(11deg); width: clamp(130px, 30%, 210px); }
+.rama-fija--destacados {
+  left: 0; bottom: -1%; transform: rotate(-9deg); display: none;
+}
+@media (min-width: 900px) { .rama-fija--destacados { display: block; } }
+
+/* Sierras */
+.sierras { display: block; width: 100%; height: auto; margin-top: clamp(1.6rem, 5vw, 3rem); }
+.sierras--sep { margin-top: 0; }
+.sierras svg { display: block; width: 100%; height: clamp(78px, 11vw, 150px); }
+
+/* --------------------------------------------------- 9. TIRA EN MOVIMIENTO */
+.tira {
+  background: var(--tinta);
+  border-top: 3px solid var(--zorro);
+  border-bottom: 3px solid var(--zorro);
+  overflow: hidden;
+  padding-block: .7rem;
+}
+.tira__pista {
+  display: flex; width: max-content;
+  animation: correr 34s linear infinite;
+}
+.tira__grupo { display: flex; flex: none; }
+.tira span {
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: var(--fs-lg);
+  color: var(--algodon);
+  white-space: nowrap;
+  padding-inline: 1.1rem;
+  display: inline-flex; align-items: center; gap: 2.2rem;
+}
+.tira span::after { content: '·'; color: var(--zorro); font-style: normal; }
+@keyframes correr { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---------------------------------------------------------- 10. PLACEHOLDER */
+.ph {
+  position: relative;
+  aspect-ratio: var(--ar, 4 / 5);
+  min-height: 150px;
+  border: 2px dashed var(--tinta);
+  border-radius: var(--r);
+  background-color: var(--papel);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--tint, var(--t-tinta)) 0, var(--tint, var(--t-tinta)) 9px,
+    transparent 9px, transparent 20px
+  );
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .35rem;
+  text-align: center;
+  padding: 1rem .9rem;
+  overflow: hidden;
+}
+.ph--4x5 { --ar: 4 / 5; }
+.ph--5x4 { --ar: 5 / 4; }
+.ph--16x9 { --ar: 16 / 9; }
+.ph--1x1 { --ar: 1 / 1; }
+/* Sin proporción forzada: la caja crece a la altura natural de la foto
+   (no se recorta). Se usa cuando la foto es más grande que el 4:5 típico
+   y conviene que llegue hasta donde termina el texto de al lado. */
+.ph--auto { aspect-ratio: auto; }
+
+.ph__tag {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400; letter-spacing: .22em;
+  background: var(--tinta); color: var(--algodon);
+  padding: .15rem .7rem; border-radius: 2px;
+}
+.ph__nombre {
+  font-family: var(--ff-display); font-weight: 600;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: var(--fs-md); line-height: 1.15;
+  margin-top: .2rem;
+}
+.ph__medida { font-size: var(--fs-xs); color: var(--tinta-2); font-weight: 600; }
+.ph__ruta {
+  font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  font-size: var(--fs-xs);
+  color: var(--tinta-2);
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(34,31,26,.22);
+  border-radius: 2px;
+  padding: .18rem .45rem;
+  margin-top: .25rem;
+  word-break: break-all;
+  line-height: 1.35;
+}
+/* Cuando el JS encuentra la foto real */
+.ph--cargado { border-style: solid; padding: 0; background-image: none; }
+.ph--cargado img { width: 100%; height: 100%; object-fit: cover; }
+
+/* -------------------------------------------------------- 11. CATEGORÍAS */
+/* Un aloe grande asomando del margen derecho, a la altura de las
+   tarjetas (no del título, para no pisar la bajada). De 900px en
+   adelante el "wrap" deja margen de sobra a los costados, así que
+   entra sin invadir ninguna tarjeta; antes de eso queda oculto. */
+.aloe-fija--cats {
+  right: -1%; top: 38%; transform: rotate(-8deg); display: none;
+}
+@media (min-width: 900px) { .aloe-fija--cats { display: block; } }
+
+.grid-cats {
+  display: grid; grid-template-columns: 1fr; gap: clamp(1.6rem, 3.5vw, 2.4rem);
+}
+.cat {
+  background: var(--papel);
+  border: 2px solid var(--tinta);
+  border-radius: var(--r);
+  padding: 1rem 1rem 1.35rem;
+  box-shadow: 7px 7px 0 0 var(--sombra, var(--tinta));
+  display: flex; flex-direction: column;
+  height: 100%;
+  text-decoration: none; color: inherit;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.cat:nth-child(odd)  { transform: rotate(-0.7deg); }
+.cat:nth-child(even) { transform: rotate(0.8deg); }
+.cat:hover { transform: rotate(0deg) translate(-2px, -3px); box-shadow: 10px 12px 0 0 var(--sombra, var(--tinta)); }
+.cat:hover .enlace-flecha { gap: .8rem; }
+.cat__cuerpo { padding: 1.1rem .25rem 0; display: flex; flex-direction: column; flex: 1; }
+.cat h3 { margin-bottom: .25rem; }
+.cat__talles {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--acento, var(--tinta-2));
+}
+.cat__txt { font-size: var(--fs-sm); color: var(--tinta-2); margin-top: .6rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; }
+.chip-lbl {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400;
+  border: 2px solid var(--tinta); border-radius: 999px;
+  padding: .15rem .7rem; background: var(--algodon);
+}
+.cat .enlace-flecha { margin-top: auto; padding-top: 1.2rem; align-self: flex-start; }
+
+/* --------------------------------------------------------- 12. PRODUCTOS */
+/* Dos columnas desde el arranque (mobile-first): una prenda al lado de la
+   otra, no una debajo de la otra. Scrollear el catálogo entero de a una
+   tarjeta por pantalla era demasiado lento en un teléfono. A partir de
+   620px hay lugar de sobra y se pasa a la grilla ancha de siempre. */
+.grid-prod {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: clamp(.7rem, 3vw, 2.1rem);
+}
+/* La escalera 620 → 2 (ancho) · 860 → 3 · 900 → 4 columnas sigue en el
+   bloque 25 (breakpoints), sin tocar: acá sólo cambia el punto de partida
+   mobile, de 1 columna a 2. Las plantas de aloe y rama ya no viven atadas
+   al hover de cada tarjeta (se veían "sueltas", sin criterio); ahora son
+   detalles fijos repartidos por la página — ver ".planta-fija" más abajo,
+   junto a las secciones de Nosotros. */
+
+.prod {
+  position: relative;
+  background: var(--papel);
+  border: 2px solid var(--tinta);
+  border-radius: var(--r);
+  padding: .8rem .8rem 1rem;
+  height: 100%;
+  display: flex; flex-direction: column;
+  box-shadow: 6px 6px 0 0 var(--sombra, var(--tinta));
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.prod:hover { transform: translate(-2px, -3px); box-shadow: 9px 10px 0 0 var(--sombra, var(--tinta)); }
+.prod__cuerpo { display: flex; flex-direction: column; flex: 1; padding-top: .85rem; }
+.prod__sub {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--acento, var(--tinta-2));
+}
+.prod__nombre { font-size: var(--fs-md); margin-top: .2rem; }
+.prod__talles {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); color: var(--tinta-2); margin-top: .25rem;
+}
+.prod__colores { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin-top: .55rem; }
+.punto {
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 1.5px solid rgba(34,31,26,.45); flex: none;
+}
+.punto--tricolor {
+  background: linear-gradient(90deg, var(--fucsia) 0 33.33%, var(--sol) 0 66.66%, var(--cielo) 0);
+}
+.prod__colores-txt { font-size: var(--fs-xs); color: var(--tinta-3); margin-top: .3rem; }
+.prod__precios { margin-top: .8rem; border-top: var(--puntada); padding-top: .7rem; }
+.prod__precio { font-family: var(--ff-display); font-weight: 700; font-size: var(--fs-lg); font-variation-settings: 'SOFT' 100, 'WONK' 1; }
+.prod__antes { font-size: var(--fs-sm); color: var(--tinta-3); text-decoration: line-through; margin-left: .45rem; }
+.prod__transf { font-size: var(--fs-sm); font-weight: 600; color: var(--monte-texto); margin-top: .1rem; }
+.prod__cuotas { font-size: var(--fs-xs); color: var(--tinta-2); }
+/* La foto, el nombre y el precio son un solo link a la ficha del producto.
+   "display:contents" hace que ese <a> no exista como caja propia: sus
+   hijos (la foto y ".prod__cuerpo") se acomodan exactamente igual que si
+   fueran hijos directos de ".prod" (que es flex-column), así no hay que
+   tocar ninguna regla de las de arriba. */
+.prod__link { display: contents; color: inherit; text-decoration: none; }
+.prod__acciones { display: flex; flex-direction: column; }
+.prod .btn { margin-top: .6rem; width: 100%; }
+/* Ver producto es la acción principal de la tarjeta: primero y en coral. */
+.prod .btn--comprar { margin-top: .95rem; background: var(--zorro-texto); color: #fff; }
+/* Con 2 tarjetas por fila en el celular, "Consultar por WhatsApp" no
+   entra en una línea y el botón se hacía altísimo (3 líneas de texto).
+   El ícono de WhatsApp ya dice de qué se trata, así que abajo de 620px
+   se esconde el "por WhatsApp" y queda sólo "Consultar". */
+.btn__extra { display: none; }
+
+.cinta-liq {
+  display: inline-block;
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400;
+  letter-spacing: .08em; text-transform: uppercase;
+  background: var(--violeta); color: #fff;
+  padding: .1rem .6rem; border-radius: 2px; margin-bottom: .35rem;
+}
+.pie-grid { margin-top: clamp(2rem, 5vw, 3rem); display: flex; justify-content: center; }
+.vacio {
+  border: var(--puntada); border-radius: var(--r);
+  padding: clamp(2rem, 6vw, 3.4rem); text-align: center; grid-column: 1 / -1;
+}
+.vacio h3, .vacio h2 { margin-bottom: .4rem; }
+.vacio__gato { width: clamp(88px, 14vw, 130px); height: auto; margin: 0 auto 1.1rem; }
+
+/* ------------------------------------------------ 12b. FICHA DE PRODUCTO */
+.pdp { padding-block: clamp(1.6rem, 4vw, 2.6rem) clamp(2.4rem, 6vw, 3.6rem); }
+.pdp__miga {
+  font-size: var(--fs-xs); color: var(--tinta-2); margin-bottom: 1.4rem;
+  overflow-x: auto; white-space: nowrap;
+}
+.pdp__miga a { color: var(--tinta-2); text-decoration: underline; text-underline-offset: 2px; }
+.pdp__miga [aria-current] { color: var(--tinta); font-weight: 600; white-space: normal; }
+
+.pdp__grid { display: grid; grid-template-columns: 1fr; gap: clamp(1.8rem, 4vw, 3rem); align-items: start; }
+.pdp__info { display: flex; flex-direction: column; }
+.pdp__nombre { font-size: var(--fs-2xl); margin-top: .2rem; }
+
+.pdp__precios { margin-top: 1.1rem; border-top: var(--puntada); border-bottom: var(--puntada); padding-block: 1rem; }
+.pdp__precio { font-family: var(--ff-display); font-weight: 700; font-size: var(--fs-xl); font-variation-settings: 'SOFT' 100, 'WONK' 1; }
+
+.pdp__opcion { margin-top: 1.3rem; }
+.pdp__etiqueta {
+  font-family: var(--ff-cinta); font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--tinta-2); margin-bottom: .55rem;
+}
+.pdp__valor { text-transform: none; letter-spacing: 0; font-family: var(--ff-texto); color: var(--tinta); font-weight: 600; }
+.pdp__link-guia {
+  margin-left: .6rem; font-family: var(--ff-texto); text-transform: none; letter-spacing: 0;
+  font-size: var(--fs-xs); font-weight: 600; color: var(--acento, var(--zorro-texto)); text-decoration: underline;
+  text-underline-offset: 2px; cursor: pointer;
+}
+
+.color-ops, .talle-ops { display: flex; flex-wrap: wrap; gap: .55rem; }
+.color-op, .talle-op {
+  display: inline-flex; align-items: center; gap: .5rem;
+  border: 2px solid var(--tinta); border-radius: 999px;
+  padding: .45rem .9rem; background: var(--papel);
+  font-size: var(--fs-sm); font-weight: 600; cursor: pointer;
+  transition: background-color .12s ease, color .12s ease, box-shadow .12s ease;
+}
+.talle-op { border-radius: var(--r); min-width: 2.9rem; justify-content: center; padding-inline: .7rem; }
+.color-op__sw { width: 16px; height: 16px; border-radius: 50%; flex: none; border: 1.5px solid rgba(34,31,26,.4); }
+.color-op__sw--tricolor { background: linear-gradient(90deg, var(--fucsia) 0 33.33%, var(--sol) 0 66.66%, var(--cielo) 0); }
+.color-op.is-activo, .talle-op.is-activo {
+  background: var(--tinta); color: var(--algodon); box-shadow: 3px 3px 0 0 var(--acento, var(--zorro));
+}
+
+.cantidad-stepper {
+  display: inline-flex; align-items: stretch; border: 2px solid var(--tinta); border-radius: var(--r);
+  overflow: hidden; width: fit-content;
+}
+.cantidad-stepper button {
+  width: 2.6rem; font-size: var(--fs-lg); font-weight: 600; background: var(--papel); cursor: pointer;
+}
+.cantidad-stepper button:hover { background: var(--arena); }
+.cantidad-stepper input {
+  width: 3rem; border: 0; border-inline: 2px solid var(--tinta); text-align: center;
+  font-size: var(--fs-base); font-weight: 600; background: var(--papel);
+}
+.cantidad-stepper--chica { transform: scale(.88); transform-origin: left center; }
+
+/* Apiladas en mobile (si no, "Agregar al carrito" no entra en una línea
+   y el botón queda más alto que "Comprar ahora"); lado a lado desde
+   520px, que es donde ya hay lugar de sobra para las dos frases. */
+.pdp__botones { display: grid; grid-template-columns: 1fr; gap: .7rem; margin-top: 1.6rem; }
+.pdp__botones .btn { width: 100%; }
+@media (min-width: 520px) { .pdp__botones { grid-template-columns: 1fr 1fr; } }
+.pdp__aviso {
+  margin-top: .6rem; font-size: var(--fs-sm); font-weight: 600; color: var(--monte-texto);
+}
+.pdp__wa { margin-top: .8rem; width: 100%; }
+.pdp__garantias {
+  margin-top: 1.6rem; display: grid; gap: .55rem;
+  font-size: var(--fs-sm); color: var(--tinta-2);
+}
+.pdp__garantias li { padding-left: 1.3rem; position: relative; }
+.pdp__garantias li::before { content: '✓'; position: absolute; left: 0; color: var(--monte-texto); font-weight: 700; }
+
+/* Modal de la guía de talles: fondo oscuro fijo + tarjeta centrada. Nada
+   de JS de terceros, sólo mostrar/ocultar con el atributo "hidden". */
+.pdp__modal {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(34, 31, 26, .55);
+  display: flex; align-items: center; justify-content: center; padding: 1.2rem;
+}
+/* El "display:flex" de arriba tiene más peso que el "display:none" que el
+   navegador le pone por defecto a [hidden] (misma especificidad, pero la
+   hoja de estilos del sitio carga después) — sin esto, el modal empieza
+   visible. */
+.pdp__modal[hidden] { display: none; }
+.pdp__modal-cuerpo {
+  position: relative; background: var(--papel); border: 2px solid var(--tinta); border-radius: var(--r);
+  box-shadow: 8px 8px 0 0 var(--tinta);
+  padding: 1.6rem; max-width: 32rem; width: 100%; max-height: 85vh; overflow-y: auto;
+}
+.pdp__modal-cerrar {
+  position: absolute; top: .7rem; right: .7rem; width: 2.2rem; height: 2.2rem;
+  border: 2px solid var(--tinta); border-radius: 50%; font-size: 1.3rem; line-height: 1; cursor: pointer;
+  background: var(--papel);
+}
+.tabla-talles-wrap { overflow-x: auto; margin-top: .8rem; }
+.tabla-talles { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); }
+.tabla-talles th, .tabla-talles td { border: 1px solid rgba(34,31,26,.25); padding: .5rem .7rem; text-align: center; }
+.tabla-talles th { background: var(--arena); font-family: var(--ff-cinta); font-weight: 400; letter-spacing: .06em; }
+.tabla-talles__notas { margin-top: .8rem; font-size: var(--fs-xs); color: var(--tinta-2); }
+
+@media (min-width: 720px) {
+  .pdp__grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 860px) {
+  .pdp__grid { grid-template-columns: .9fr 1.1fr; gap: clamp(2.4rem, 5vw, 4rem); }
+}
+
+/* ------------------------------------------------------------ 12c. CARRITO */
+.carrito-grid { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3rem); align-items: start; }
+#carrito { display: grid; gap: 1rem; }
+
+.linea-carrito {
+  display: grid; grid-template-columns: 5.5rem 1fr auto; gap: 1rem; align-items: start;
+  background: var(--papel); border: 2px solid var(--tinta); border-radius: var(--r);
+  padding: .9rem; box-shadow: 4px 4px 0 0 var(--tinta);
+}
+.linea-carrito__foto { width: 5.5rem; text-decoration: none; }
+.linea-carrito__foto .ph__nombre, .linea-carrito__foto .ph__medida, .linea-carrito__foto .ph__ruta { display: none; }
+.linea-carrito__foto .ph__tag { font-size: .6rem; padding: .1rem .4rem; }
+.linea-carrito__info { display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.linea-carrito__nombre { font-weight: 700; text-decoration: none; color: var(--tinta); }
+.linea-carrito__nombre:hover { text-decoration: underline; }
+.linea-carrito__detalle { font-size: var(--fs-sm); color: var(--tinta-2); }
+.linea-carrito__precio { font-size: var(--fs-sm); color: var(--tinta-2); }
+.linea-carrito__quitar {
+  align-self: flex-start; font-size: var(--fs-xs); color: var(--zorro-texto); text-decoration: underline;
+  text-underline-offset: 2px; cursor: pointer; margin-top: .2rem;
+}
+.linea-carrito__subtotal { font-family: var(--ff-display); font-weight: 700; font-size: var(--fs-md); text-align: right; white-space: nowrap; }
+
+.resumen-carrito {
+  background: var(--arena); border: 2px solid var(--tinta); border-radius: var(--r);
+  padding: 1.3rem; box-shadow: 5px 5px 0 0 var(--tinta); position: sticky; top: calc(var(--nav-h) + 16px);
+}
+/* Datos de envío: la provincia es la que decide la zona sola (ver
+   main.js, "zonaDeProvincia") — no hay que elegir la zona a mano. */
+.campo { display: block; margin-bottom: .9rem; }
+.campo__etiqueta {
+  display: block; font-family: var(--ff-cinta); font-size: var(--fs-xs); letter-spacing: .06em;
+  text-transform: uppercase; color: var(--tinta-2); margin-bottom: .3rem;
+}
+.campo input[type="text"], .campo input[type="tel"], .campo select {
+  width: 100%; border: 2px solid var(--tinta); border-radius: var(--r);
+  padding: .6rem .7rem; font-size: var(--fs-sm); font-family: var(--ff-texto); background: var(--papel);
+}
+.campo--check { display: flex; align-items: center; gap: .55rem; font-size: var(--fs-sm); cursor: pointer; }
+.campo--check input { width: 1.1rem; height: 1.1rem; flex: none; }
+.campo__aviso {
+  background: #FBEAEA; border: 2px solid var(--zorro-texto); color: var(--zorro-texto);
+  border-radius: var(--r); padding: .7rem .9rem; font-size: var(--fs-sm); font-weight: 600; margin-top: .8rem;
+}
+.resumen-carrito__filas { margin-top: 1.2rem; display: grid; gap: .5rem; font-size: var(--fs-sm); }
+.resumen-carrito__fila { display: flex; justify-content: space-between; }
+.resumen-carrito__fila--total { font-size: var(--fs-lg); font-weight: 700; border-top: var(--puntada); padding-top: .7rem; margin-top: .3rem; }
+.resumen-carrito .btn { width: 100%; margin-top: 1.1rem; }
+.resumen-carrito__vaciar { display: block; margin: .8rem auto 0; font-size: var(--fs-xs); color: var(--tinta-2); text-decoration: underline; cursor: pointer; }
+
+@media (min-width: 860px) {
+  .carrito-grid { grid-template-columns: 1.6fr 1fr; }
+}
+
+/* -------------------------------------------------------- 12d. NAV: CARRITO */
+/* Va último dentro de ".nav__in" (después de ".nav__links"), sin margen
+   propio: así queda pegado al link que en cada ancho de pantalla tiene el
+   "margin-left:auto" (".nav__links" en desktop, ".hamb" en mobile) sin
+   pisarlo — los dos terminan empujados juntos contra el borde derecho. */
+.nav__carrito { position: relative; display: inline-flex; align-items: center; padding: .3rem; margin-right: -.3rem; }
+.nav__carrito svg { width: 24px; height: 24px; }
+.nav__carrito-badge {
+  position: absolute; top: -.3rem; right: -.3rem;
+  min-width: 1.15rem; height: 1.15rem; padding-inline: .2rem;
+  border-radius: 999px; background: var(--zorro-texto); color: #fff;
+  font-size: .65rem; font-weight: 700; line-height: 1.15rem; text-align: center;
+  border: 2px solid var(--algodon);
+}
+
+/* ---------------------------------------------------------- 13. NOSOTROS */
+/* La foto va centrada contra el texto, no pegada arriba: como casi
+   siempre el texto es más largo que la foto, alinear arriba dejaba la
+   foto "terminada" mucho antes de que el texto termine. Centrada, queda
+   a media altura del bloque, se vea como se vea de larga cada columna. */
+.dos-col {
+  display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3.6rem);
+  align-items: center;
+}
+/* "La zona": el texto es largo (párrafos + chips de fauna), así que con
+   todo el texto de un tirón la foto quedaría relegada al final. Se corta
+   el texto después del primer párrafo, con la foto justo ahí: en mobile
+   queda arriba, a la altura del título; en desktop las dos mitades se
+   apilan en la columna de texto y la foto ocupa las dos filas al lado. */
+.zona-grid {
+  display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3rem);
+}
+@media (min-width: 860px) {
+  .zona-grid {
+    grid-template-columns: 1.05fr .95fr;
+    grid-template-rows: auto auto;
+    column-gap: clamp(2.4rem, 5vw, 4rem);
+    row-gap: 1.6rem;
+    align-items: start;
+  }
+  .zona-texto-1 { grid-column: 1; grid-row: 1; }
+  .zona-texto-2 { grid-column: 1; grid-row: 2; }
+  .zona-img     { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+}
+
+/* Otra rama fija, asomando detrás del encabezado de esta sección — sólo
+   de tablet en adelante, para no competir con el texto en el celular. */
+.rama-fija--zona { right: 0; top: 2%; transform: rotate(9deg); display: none; }
+@media (min-width: 620px) { .rama-fija--zona { display: block; } }
+
+/* Un aloe chico agazapado en la esquina de la foto de esta sección. */
+.aloe-fija--zona-foto { left: -14%; bottom: -6%; transform: rotate(-10deg); width: clamp(90px, 30%, 160px); }
+
+.parrafo-grande {
+  font-family: var(--ff-display); font-size: var(--fs-lg); line-height: 1.34;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  margin-bottom: 1rem;
+}
+.pasos { margin-top: 1.8rem; display: grid; gap: 1.1rem; counter-reset: paso; }
+.paso { display: flex; gap: 1rem; align-items: flex-start; }
+.paso__n {
+  counter-increment: paso; flex: none;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--tinta);
+  display: grid; place-items: center;
+  font-family: var(--ff-display); font-weight: 700; font-size: var(--fs-md);
+  background: var(--sol);
+  box-shadow: 3px 3px 0 0 var(--tinta);
+}
+.paso__n::before { content: counter(paso); }
+.paso h3 { font-size: var(--fs-md); }
+.paso p { font-size: var(--fs-sm); color: var(--tinta-2); }
+
+/* ------------------------------------------------------- 14. CÓMO COMPRAR */
+.grid-4 { display: grid; grid-template-columns: 1fr; gap: clamp(1.1rem, 2.5vw, 1.7rem); }
+.tarjeta-icono {
+  background: var(--papel);
+  border: 2px solid var(--tinta); border-radius: var(--r);
+  padding: 1.3rem 1.2rem;
+  box-shadow: 5px 5px 0 0 var(--sombra, var(--tinta));
+}
+.tarjeta-icono svg { width: 34px; height: 34px; margin-bottom: .7rem; }
+.tarjeta-icono h3 { font-size: var(--fs-md); margin-bottom: .25rem; }
+.tarjeta-icono p { font-size: var(--fs-sm); color: var(--tinta-2); }
+
+/* ---------------------------------------------------------- 15. OPINIONES */
+.grid-3 { display: grid; grid-template-columns: 1fr; gap: clamp(1.2rem, 2.6vw, 1.9rem); }
+.opinion {
+  background: var(--papel); border: 2px solid var(--tinta); border-radius: var(--r);
+  padding: 1.4rem 1.3rem;
+  box-shadow: 6px 6px 0 0 var(--zorro);
+  display: flex; flex-direction: column;
+}
+.opinion:nth-child(2) { box-shadow: 6px 6px 0 0 var(--fucsia); }
+.opinion:nth-child(3) { box-shadow: 6px 6px 0 0 var(--monte); }
+/* Las estrellas van en un ámbar más oscuro que el --sol: el amarillo puro sobre
+   blanco no llega al 3:1 que pide AA para un gráfico que transmite información. */
+.estrellas { color: #B9800E; letter-spacing: .12em; font-size: var(--fs-md); }
+.opinion p { font-size: var(--fs-sm); margin: .6rem 0 1rem; flex: 1; }
+.opinion footer { font-size: var(--fs-xs); color: var(--tinta-3); border-top: var(--puntada); padding-top: .6rem; }
+.opinion footer strong { color: var(--tinta); display: block; font-size: var(--fs-sm); }
+
+.badge-google {
+  display: inline-flex; align-items: center; gap: .6rem;
+  border: 2px solid var(--tinta); border-radius: var(--r);
+  background: var(--papel); padding: .6rem 1rem;
+  box-shadow: 4px 4px 0 0 var(--tinta);
+  text-decoration: none; font-size: var(--fs-sm); font-weight: 600;
+  margin-top: clamp(1.5rem, 4vw, 2.2rem);
+}
+.badge-google .estrellas { font-size: var(--fs-sm); }
+
+/* ------------------------------------------------------------- 16. LOCAL */
+.datos-local { display: grid; gap: 0; }
+.dato { border-top: var(--puntada); padding-block: .95rem; }
+.dato:first-child { border-top: 0; padding-top: 0; }
+.dato__k {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--tinta-3);
+}
+.dato__v { font-size: var(--fs-md); margin-top: .15rem; }
+.dato__v a { text-decoration: none; border-bottom: 2px solid var(--zorro); }
+.dato small { display: block; font-size: var(--fs-sm); color: var(--tinta-2); }
+
+.mapa {
+  border: 2px solid var(--tinta); border-radius: var(--r);
+  box-shadow: 7px 7px 0 0 var(--monte);
+  overflow: hidden; background: var(--papel);
+}
+.mapa iframe { width: 100%; height: clamp(280px, 42vw, 400px); border: 0; }
+
+/* -------------------------------------------------------------- 17. FAQ */
+.faq { max-width: 820px; }
+.faq__item { border-bottom: var(--puntada); }
+.faq__item:first-child { border-top: var(--puntada); }
+.faq__b {
+  width: 100%; text-align: left;
+  display: flex; align-items: flex-start; gap: 1rem; justify-content: space-between;
+  padding: 1.1rem .2rem;
+  font-family: var(--ff-display); font-weight: 600; font-size: var(--fs-md);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  line-height: 1.25;
+}
+.faq__mas {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--tinta); position: relative; margin-top: 2px;
+  transition: background-color .16s ease;
+}
+.faq__mas::before, .faq__mas::after {
+  content: ''; position: absolute; inset: 50% 6px auto 6px; height: 2px;
+  background: var(--tinta); transform: translateY(-1px);
+  transition: transform .2s ease, opacity .2s ease;
+}
+.faq__mas::after { transform: translateY(-1px) rotate(90deg); }
+.faq__b[aria-expanded="true"] .faq__mas { background: var(--zorro); }
+.faq__b[aria-expanded="true"] .faq__mas::before,
+.faq__b[aria-expanded="true"] .faq__mas::after { background: #fff; }
+.faq__b[aria-expanded="true"] .faq__mas::after { transform: translateY(-1px) rotate(0deg); opacity: 0; }
+.faq__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .26s ease; }
+.faq__panel.is-open { grid-template-rows: 1fr; }
+.faq__panel > div { overflow: hidden; }
+.faq__panel p { padding: 0 3rem 1.2rem .2rem; color: var(--tinta-2); font-size: var(--fs-sm); }
+
+/* -------------------------------------------------------------- 18. CTA */
+.cta { text-align: center; }
+.cta h2 { max-width: 18ch; margin-inline: auto; }
+.cta__gato { width: clamp(72px, 9vw, 104px); height: auto; margin: 0 auto 1.4rem; }
+.cta .ojal { justify-content: center; }
+.cta .bajada { margin: 1rem auto 1.8rem; }
+.cta__botones { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; }
+
+/* ------------------------------------------------------------ 19. FOOTER */
+.footer { background: var(--tinta); color: var(--algodon); padding-block: clamp(2.6rem, 6vw, 4rem) 1.6rem; }
+.footer__grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+.footer h4 {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-md); font-weight: 400; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--sol); margin-bottom: .8rem;
+}
+.footer ul { display: grid; gap: .45rem; }
+.footer a { text-decoration: none; font-size: var(--fs-sm); color: #DCD5C8; }
+.footer a:hover { color: var(--algodon); border-bottom: 1px solid var(--zorro); }
+.footer p { font-size: var(--fs-sm); color: #B9B0A2; }
+.footer .logo__sub { color: #B9B0A2; }
+/* En el pie el logotipo respira más que en la barra */
+.logo__txt--pie { gap: 6px; }
+.logo__txt--pie .logo__nombre { height: clamp(26px, 3vw, 34px); }
+.footer__pie {
+  margin-top: clamp(2rem, 5vw, 3rem); border-top: 2px dashed rgba(250,246,238,.28);
+  padding-top: 1.2rem; display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; justify-content: space-between;
+  font-size: var(--fs-xs); color: #9C9384;
+}
+
+/* ------------------------------------------------- 20. WHATSAPP FLOTANTE */
+.fab {
+  position: fixed; right: clamp(.8rem, 3vw, 1.6rem); bottom: clamp(.8rem, 3vw, 1.6rem);
+  z-index: 70;
+  display: inline-flex; align-items: center; gap: .55rem;
+  background: var(--monte-texto); color: #fff;
+  border: 2px solid var(--tinta); border-radius: 999px;
+  padding: .7rem 1.05rem;
+  box-shadow: 4px 4px 0 0 var(--tinta);
+  text-decoration: none; font-weight: 600; font-size: var(--fs-sm);
+}
+.fab:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--tinta); }
+.fab svg { width: 22px; height: 22px; flex: none; }
+
+/* --------------------------------------------------- 21. AVISO WHATSAPP */
+.aviso-wa {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  background: #B00020; color: #fff;
+  font-size: var(--fs-sm); font-weight: 600;
+  padding: .7rem 1rem; text-align: center;
+}
+.aviso-wa code { font-family: ui-monospace, Consolas, monospace; background: rgba(0,0,0,.28); padding: .1rem .35rem; border-radius: 3px; }
+
+/* ------------------------------------------------------------ 22. FILTROS */
+.filtros {
+  position: sticky; top: var(--nav-h); z-index: 50;
+  background: var(--algodon);
+  border-bottom: 2px solid var(--tinta);
+  padding-block: .85rem;
+}
+.filtros__fila {
+  display: flex; gap: .5rem; align-items: center;
+  overflow-x: auto; overflow-y: hidden;
+  padding-bottom: .25rem;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.filtros__fila + .filtros__fila { margin-top: .55rem; }
+.filtros__et {
+  font-family: var(--ff-cinta);
+  font-size: var(--fs-sm); font-weight: 400; letter-spacing: .11em; text-transform: uppercase;
+  color: var(--tinta-3); flex: none; padding-right: .3rem;
+}
+.chip {
+  flex: none;
+  font-size: var(--fs-sm); font-weight: 600;
+  border: 2px solid var(--tinta); border-radius: 999px;
+  padding: .35rem .95rem; background: var(--papel);
+  white-space: nowrap;
+  transition: background-color .14s ease, color .14s ease, box-shadow .14s ease;
+}
+.chip[aria-pressed="true"] {
+  background: var(--tinta); color: var(--algodon);
+  box-shadow: 3px 3px 0 0 var(--acento, var(--zorro));
+}
+.contador { font-family: var(--ff-cinta); font-size: var(--fs-md); color: var(--tinta-2); font-weight: 400; letter-spacing: .02em; }
+
+.franja-pedido {
+  border: 2px solid var(--tinta); border-radius: var(--r);
+  background: var(--papel); box-shadow: 7px 7px 0 0 var(--sol);
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+  display: grid; gap: 1.1rem; align-items: center;
+}
+
+/* ---------------------------------------------------------- 23. REVELADO */
+.js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+.js .reveal.is-in { opacity: 1; transform: none; }
+
+/* ---------------------------------------------------------- 24. NO-JS */
+noscript .nota-nojs {
+  display: block; border: var(--puntada); border-radius: var(--r);
+  padding: 1.2rem; font-size: var(--fs-sm);
+}
+
+/* ======================================================================
+   25. BREAKPOINTS  (mobile-first: 520 · 620 · 720 · 860 · 880 · 900)
+   ====================================================================== */
+@media (min-width: 520px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .footer__grid { grid-template-columns: repeat(2, 1fr); }
+  .franja-pedido { grid-template-columns: 1fr auto; }
+}
+
+@media (min-width: 620px) {
+  .grid-cats { grid-template-columns: repeat(2, 1fr); }
+  .grid-prod { grid-template-columns: repeat(2, 1fr); }
+  .btn__extra { display: inline; }
+}
+
+@media (min-width: 720px) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .pasos { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 860px) {
+  .dos-col { grid-template-columns: 1.05fr .95fr; gap: clamp(2.4rem, 5vw, 4rem); }
+  .dos-col--invertida { grid-template-columns: .95fr 1.05fr; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-prod { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 880px) {
+  .hero__grid { grid-template-columns: 1.08fr .92fr; }
+  .grid-cats { grid-template-columns: repeat(3, 1fr); }
+  .footer__grid { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; }
+}
+
+@media (min-width: 900px) {
+  :root { --nav-h: 76px; }
+  .grid-prod { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Menú móvil */
+@media (max-width: 879px) {
+  .nav { position: sticky; }
+  .nav__in { position: relative; }
+  .hamb { display: inline-flex; }
+  .nav__links { display: none; }
+  .nav.is-open { background: var(--algodon); border-bottom-color: var(--tinta); }
+  .nav.is-open .nav__links {
+    display: flex; flex-direction: column; align-items: stretch;
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--algodon);
+    border-bottom: 2px solid var(--tinta);
+    padding: .4rem var(--gutter) 1.3rem;
+    gap: 0; margin-left: 0;
+    max-height: calc(100vh - var(--nav-h)); overflow-y: auto;
+  }
+  .nav.is-open .nav__links > a {
+    padding: .9rem 0; border-bottom: var(--puntada); font-size: var(--fs-md);
+  }
+  .nav.is-open .nav__links > a::after { display: none; }
+  .nav__wa { margin-top: 1.1rem; }
+  .nav__wa .btn { width: 100%; }
+}
+
+/* ======================================================================
+   26. TÁCTIL Y PANTALLAS CHICAS: se apagan las animaciones por completo
+   ====================================================================== */
+@media (hover: none), (max-width: 720px) {
+  .js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .cat, .prod { transform: none !important; }
+  .cat:hover, .prod:hover, .btn:hover, .fab:hover { transform: none; }
+  .cat  { box-shadow: 5px 5px 0 0 var(--sombra, var(--tinta)); }
+  .prod { box-shadow: 4px 4px 0 0 var(--sombra, var(--tinta)); }
+  .cat:hover  { box-shadow: 5px 5px 0 0 var(--sombra, var(--tinta)); }
+  .prod:hover { box-shadow: 4px 4px 0 0 var(--sombra, var(--tinta)); }
+  .btn:hover  { box-shadow: 4px 4px 0 0 var(--tinta); }
+  .fab:hover  { box-shadow: 4px 4px 0 0 var(--tinta); }
+  .mapa { box-shadow: 5px 5px 0 0 var(--monte); }
+  .pila__unica { transform: none; box-shadow: 6px 6px 0 0 var(--fucsia); }
+}
+
+/* ======================================================================
+   27. MOVIMIENTO REDUCIDO
+   Sólo se apaga lo verdaderamente intrusivo: la tira y el scroll suave.
+   Las micro-interacciones siguen vivas.
+   ====================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .tira__pista { animation: none; transform: none; }
+  .tira { overflow-x: auto; }
+}
+
+/* ======================================================================
+   28. PÁGINA NOSOTROS
+   ====================================================================== */
+.banner-ancho { margin-top: clamp(1.8rem, 4vw, 2.6rem); }
+.banner-ancho .ph { box-shadow: 8px 8px 0 0 var(--zorro); border-style: dashed; }
+.banner-ancho .ph--cargado { border-style: solid; }
+
+.texto-largo p { margin-bottom: 1.05rem; max-width: 62ch; }
+.texto-largo p:last-child { margin-bottom: 0; }
+
+.lista-puntada { display: grid; gap: 0; margin-top: 1.4rem; }
+.lista-puntada li { border-top: var(--puntada); padding-block: .85rem; font-size: var(--fs-sm); }
+.lista-puntada li:last-child { border-bottom: var(--puntada); }
+.lista-puntada strong { display: block; font-size: var(--fs-base); }
+
+.fauna { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.4rem; }
+.fauna li {
+  font-size: var(--fs-sm); font-weight: 600;
+  border: 2px solid var(--tinta); border-radius: 999px;
+  padding: .3rem .9rem; background: var(--papel);
+  box-shadow: 3px 3px 0 0 var(--sombra, var(--zorro));
+}
+
+@media (hover: none), (max-width: 720px) {
+  .fauna li { box-shadow: 2px 2px 0 0 var(--sombra, var(--zorro)); }
+  .banner-ancho .ph { box-shadow: 5px 5px 0 0 var(--zorro); }
+}
+
+/* ======================================================================
+   29. CINTA DE COSTURA
+   ----------------------------------------------------------------------
+   Reconstrucción en SVG de "cintas material.png". Va como background que
+   se repite en el eje X, así que corta limpio a cualquier ancho (el PNG
+   original medía 2172 px fijos y se partía a mitad de puntada).
+   Son dos pasadas sobre la misma onda: los guiones hacen la puntada y los
+   puntos redondos, los nuditos.
+
+   Dónde se usa: en el borde exacto donde el fondo cambia de crudo a arena.
+   Ahí hay dos "telas" distintas, y la cinta es la costura que las une.
+   Es una sola regla, así que la costura aparece sola en cada sección arena
+   de las tres páginas, sin tocar el HTML.
+   ====================================================================== */
+.cinta,
+.seccion--arena::before {
+  height: clamp(34px, 5vw, 56px);
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240%22%20height%3D%22100%22%20viewBox%3D%220%200%20240%20100%22%3E%3Cpath%20d%3D%22M0%2C38%20C40%2C14%2080%2C14%20120%2C38%20S200%2C62%20240%2C38%22%20fill%3D%22none%22%20stroke%3D%22%2523FFC700%22%20stroke-width%3D%2220%22%20stroke-dasharray%3D%225%207%22%2F%3E%3Cpath%20d%3D%22M0%2C38%20C40%2C14%2080%2C14%20120%2C38%20S200%2C62%20240%2C38%22%20transform%3D%22translate%280%2C17%29%22%20fill%3D%22none%22%20stroke%3D%22%2523FFC700%22%20stroke-width%3D%2210%22%20stroke-linecap%3D%22round%22%20stroke-dasharray%3D%220%2021%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: auto 100%;
+}
+.seccion--arena::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.cinta--coral { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240%22%20height%3D%22100%22%20viewBox%3D%220%200%20240%20100%22%3E%3Cpath%20d%3D%22M0%2C38%20C40%2C14%2080%2C14%20120%2C38%20S200%2C62%20240%2C38%22%20fill%3D%22none%22%20stroke%3D%22%2523F95850%22%20stroke-width%3D%2220%22%20stroke-dasharray%3D%225%207%22%2F%3E%3Cpath%20d%3D%22M0%2C38%20C40%2C14%2080%2C14%20120%2C38%20S200%2C62%20240%2C38%22%20transform%3D%22translate%280%2C17%29%22%20fill%3D%22none%22%20stroke%3D%22%2523F95850%22%20stroke-width%3D%2210%22%20stroke-linecap%3D%22round%22%20stroke-dasharray%3D%220%2021%22%2F%3E%3C%2Fsvg%3E"); }
+.cinta--lima  { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240%22%20height%3D%22100%22%20viewBox%3D%220%200%20240%20100%22%3E%3Cpath%20d%3D%22M0%2C38%20C40%2C14%2080%2C14%20120%2C38%20S200%2C62%20240%2C38%22%20fill%3D%22none%22%20stroke%3D%22%252397D019%22%20stroke-width%3D%2220%22%20stroke-dasharray%3D%225%207%22%2F%3E%3Cpath%20d%3D%22M0%2C38%20C40%2C14%2080%2C14%20120%2C38%20S200%2C62%20240%2C38%22%20transform%3D%22translate%280%2C17%29%22%20fill%3D%22none%22%20stroke%3D%22%252397D019%22%20stroke-width%3D%2210%22%20stroke-linecap%3D%22round%22%20stroke-dasharray%3D%220%2021%22%2F%3E%3C%2Fsvg%3E"); }
+.cinta--suelta { margin-block: clamp(.6rem, 2vw, 1.4rem); }
+
+/* En pantallas chicas la costura se achica junto con todo lo demás */
+@media (max-width: 620px) {
+  .cinta, .seccion--arena::before { height: 30px; }
+}
+
+/* Impresión */
+@media print {
+  .nav, .fab, .filtros, .tira, .aviso-wa { display: none !important; }
+  body { background: #fff; }
+  .cat, .prod, .opinion, .tarjeta-icono, .mapa { box-shadow: none; transform: none; }
+}

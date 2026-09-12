@@ -1,0 +1,24 @@
+# Dependencias de Node (se instalan solas en Vercel a partir de package.json)
+node_modules/
+
+# Configuración local de Vercel (se genera al conectar el proyecto)
+.vercel
+
+# Variables de entorno con datos reales — NUNCA subir esto a GitHub.
+# Las variables de verdad se cargan en el panel de Vercel, no acá.
+.env
+.env.local
+.env*.local
+
+# Configuración local de este asistente (no es parte del sitio)
+.claude/
+
+# PDFs de referencia de productos sin categorizar todavía — no son
+# parte de la web, no hace falta que viajen al repositorio.
+"FINAL GUANACO.pdf"
+"FINAL MARA.pdf"
+
+# Fotos originales sin recortar, guardadas como respaldo — la web usa
+# las versiones ya recortadas en .webp, éstas no hacen falta acá.
+"assets/img/nosotros-banner mejor calidad.png"
+assets/img/fachada-local.png

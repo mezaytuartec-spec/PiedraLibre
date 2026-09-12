@@ -1,0 +1,85 @@
+# ============================================================================
+# PIEDRA LIBRE · LOS MOLLES
+# Configuración para hosting compartido con Apache (Hostinger, cPanel, etc.)
+# En Netlify o Vercel este archivo se ignora: no molesta, dejalo igual.
+# ============================================================================
+
+# ------------------------------------------------------------ Página de inicio
+DirectoryIndex index.html
+
+# ---------------------------------------------------------- Compresión (gzip)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ------------------------------------------------------------------- Caché
+# El HTML no se cachea (así los cambios de texto se ven al instante).
+# El CSS y el JS se cachean un año: por eso llevan ?v=AAAAMMDD en el link.
+# Si tocás styles.css o main.js, cambiá ese número en las 3 páginas.
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  ExpiresByType text/html                 "access plus 0 seconds"
+  ExpiresByType text/css                  "access plus 1 year"
+  ExpiresByType application/javascript    "access plus 1 year"
+  ExpiresByType text/javascript           "access plus 1 year"
+
+  ExpiresByType image/webp                "access plus 6 months"
+  ExpiresByType image/jpeg                "access plus 6 months"
+  ExpiresByType image/png                 "access plus 6 months"
+  ExpiresByType image/svg+xml             "access plus 6 months"
+  ExpiresByType image/x-icon              "access plus 1 year"
+
+  ExpiresByType font/woff2                "access plus 1 year"
+  ExpiresByType application/xml           "access plus 1 hour"
+  ExpiresByType text/plain                "access plus 1 hour"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(webp|jpg|jpeg|png|svg|ico|woff2)$">
+    Header set Cache-Control "public, max-age=15552000"
+  </FilesMatch>
+
+  # Seguridad básica
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# --------------------------------------------------------------- Tipos MIME
+<IfModule mod_mime.c>
+  AddType image/webp             .webp
+  AddType image/svg+xml          .svg
+  AddType application/font-woff2 .woff2
+</IfModule>
+
+# ------------------------------------------------------- URLs sin la extensión
+# Permite entrar a /productos además de /productos.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Forzar HTTPS (descomentá estas dos líneas cuando el certificado esté activo)
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # /productos  ->  /productos.html
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}\.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+</IfModule>
+
+# ------------------------------------------------------------------- Errores
+ErrorDocument 404 /index.html
+
+# ------------------------------------------------------- No listar carpetas
+Options -Indexes

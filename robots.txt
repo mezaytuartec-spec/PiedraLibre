@@ -1,0 +1,7 @@
+# Piedra Libre · Los Molles
+# Si cambiás el dominio, cambiá también la línea Sitemap de abajo.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://piedralibrelosmolles.com.ar/sitemap.xml

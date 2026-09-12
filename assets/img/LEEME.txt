@@ -1,0 +1,80 @@
+============================================================================
+PIEDRA LIBRE · LOS MOLLES — DÓNDE VAN LAS FOTOS
+============================================================================
+
+Todas las fotos van en esta misma carpeta (assets/img/).
+
+CÓMO FUNCIONA
+-------------
+Mientras no haya una foto, en la web se ve un recuadro punteado que dice
+"FOTO", qué va ahí, el tamaño y el nombre de archivo exacto.
+Apenas dejás el archivo con ese nombre en esta carpeta, la foto aparece sola.
+No hay que tocar nada de código.
+
+Si no ves el cambio, refrescá con Ctrl+F5.
+
+REGLAS
+------
+· El nombre tiene que ser EXACTO: todo en minúscula, con guiones, sin acentos,
+  sin espacios, y terminando en .webp
+· Formato .webp. Si tenés .jpg, convertilo en https://squoosh.app (gratis).
+· Peso ideal: menos de 200 KB por foto. Nunca más de 500 KB.
+· Respetá la proporción que dice cada línea o la foto se va a ver recortada.
+
+============================================================================
+LISTA COMPLETA
+============================================================================
+
+--- MARCA (ya están, NO las borres) ----------------------------------------
+isotipo.png .......................... el gato en el círculo — va en la barra
+logotipo.webp ........................ "Piedra Libre" en tinta, para fondo claro
+logotipo-claro.webp .................. "Piedra Libre" en crudo, para fondo oscuro
+mascota-gato.webp .................... el gato entero, negro
+mascota-gato-claro.webp .............. el gato entero, crudo (fondo oscuro)
+favicon-32.png / favicon-192.png ..... ícono de la pestaña
+apple-touch-icon.png ................. ícono para iPhone
+og-piedra-libre.jpg .................. la imagen que se ve al compartir el link
+
+--- PORTADA (index.html) — ya están, NO las borres ---------------------------
+hero-principal.webp .................. el nene de las burbujas, remera Zorrito
+taller-costura.webp .................. ya está — prendas dobladas con la etiqueta real
+
+--- TARJETAS DE CATEGORÍA — ya están, NO las borres --------------------------
+cat-bebes.webp ....................... el bebé con la remera de colibríes
+cat-ninas.webp ....................... la nena del buzo violeta, puerta amarilla
+cat-ninos.webp ....................... el nene de la capucha, estampa sachacabra
+cat-discontinuos.webp ................ 1200 × 960 px   (5:4)   (opcional, pendiente)
+
+--- PRODUCTOS (ya están, NO las borres) -------------------------------------
+Las 26 fotos de productos son las mismas que están publicadas hoy en
+piedralibrelosmolles45.mitiendanube.com. Se copiaron el 2026-09-11 junto con
+nombres, precios, colores y talles. Si en Tiendanube subís una foto nueva de
+un producto que ya está acá, reemplazá el archivo con el mismo nombre.
+
+Dos productos de esa tienda NO se copiaron porque todavía no tenían categoría
+asignada ahí ("Chaleco Guanaquita" y "Chaleco Mara"): agregalos vos en
+lib/manifest.js cuando decidas en qué categoría van (ver el punto 6,
+"SI AGREGÁS UN PRODUCTO NUEVO", más abajo).
+
+--- PÁGINA NOSOTROS (nosotros.html) -----------------------------------------
+nosotros-banner.webp ................. ya está — los 4 chicos sentados en el tronco
+fachada-local.webp ................... ya está — Mapi doblando una remera en el taller
+materiales-telas.webp ................ ya está — la nena con el gorro de gatitos (sin recortar)
+sierras-comechingones.webp ........... ya está — el nene con la capucha entre las pencas
+
+Si en algún momento conseguís una foto del frente del local, dejala como
+fachada-local.webp y va a reemplazar la que hay ahora.
+
+--- REDES E ÍCONOS ---------------------------------------------------------
+(Los íconos y la imagen para compartir ya están hechos con el logo de la marca.
+ Si algún día querés cambiar la de compartir, reemplazá og-piedra-libre.jpg
+ respetando 1200 × 630 px.)
+
+============================================================================
+SI AGREGÁS UN PRODUCTO NUEVO
+============================================================================
+1. Abrí lib/manifest.js
+2. Copiá un renglón de producto entero y pegalo abajo
+3. Cambiale id, nombre, categoría, talles, colores y precio
+4. En el campo "img" poné: assets/img/nombre-que-vos-quieras.webp
+5. Dejá la foto en esta carpeta con ese nombre exacto
