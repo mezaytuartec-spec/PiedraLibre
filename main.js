@@ -234,7 +234,6 @@
     var cat = catPorId(p.cat) || {};
     var color = cat.color || '#221F1A';
     var acento = cat.colorTexto || cat.color || '#221F1A';
-    var transf = Math.round(p.precio * (1 - (C.descTransferencia || 0) / 100));
     var cuota = Math.round(p.precio / (C.cuotas || 3));
     var mapaColores = B.colores || {};
 
@@ -271,7 +270,6 @@
               '<p class="prod__precio">' + pesos(p.precio) +
                 (liq ? '<span class="prod__antes">' + pesos(p.precioAntes) + '</span>' : '') +
               '</p>' +
-              '<p class="prod__transf">' + pesos(transf) + ' con transferencia</p>' +
               '<p class="prod__cuotas">' + (C.cuotas || 3) + ' cuotas sin interés de ' + pesos(cuota) + '</p>' +
             '</div>' +
           '</div>' +
@@ -315,7 +313,6 @@
       rating: String(M.google ? M.google.rating : '').replace('.', ','),
       reviews: M.google ? M.google.reviews : '',
       cuotas: C.cuotas,
-      descTransferencia: C.descTransferencia + '%',
       envioGratisDesde: pesos(C.envioGratisDesde),
       pagosEnLocal: (M.pagosEnLocal || []).join(' · ')
     };
@@ -673,7 +670,6 @@
     var mapaColores = B.colores || {};
     var talles = tallesDisponibles(p.talles);
     var liq = p.precioAntes > 0;
-    var transf = Math.round(p.precio * (1 - (C.descTransferencia || 0) / 100));
     var cuota = Math.round(p.precio / (C.cuotas || 3));
     var guia = (B.talles || {})[p.guiaTalles];
 
@@ -722,7 +718,6 @@
 
             '<div class="pdp__precios">' +
               '<p class="pdp__precio">' + pesos(p.precio) + (liq ? '<span class="prod__antes">' + pesos(p.precioAntes) + '</span>' : '') + '</p>' +
-              '<p class="prod__transf">' + pesos(transf) + ' con transferencia</p>' +
               '<p class="prod__cuotas">' + (C.cuotas || 3) + ' cuotas sin interés de ' + pesos(cuota) + '</p>' +
             '</div>' +
 

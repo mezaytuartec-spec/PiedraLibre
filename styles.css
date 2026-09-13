@@ -613,7 +613,6 @@ summary:focus-visible, [tabindex]:focus-visible {
 .prod__precios { margin-top: .8rem; border-top: var(--puntada); padding-top: .7rem; }
 .prod__precio { font-family: var(--ff-display); font-weight: 700; font-size: var(--fs-lg); font-variation-settings: 'SOFT' 100, 'WONK' 1; }
 .prod__antes { font-size: var(--fs-sm); color: var(--tinta-3); text-decoration: line-through; margin-left: .45rem; }
-.prod__transf { font-size: var(--fs-sm); font-weight: 600; color: var(--monte-texto); margin-top: .1rem; }
 .prod__cuotas { font-size: var(--fs-xs); color: var(--tinta-2); }
 /* La foto, el nombre y el precio son un solo link a la ficha del producto.
    "display:contents" hace que ese <a> no exista como caja propia: sus
@@ -884,7 +883,6 @@ summary:focus-visible, [tabindex]:focus-visible {
 .paso p { font-size: var(--fs-sm); color: var(--tinta-2); }
 
 /* ------------------------------------------------------- 14. CÓMO COMPRAR */
-.grid-4 { display: grid; grid-template-columns: 1fr; gap: clamp(1.1rem, 2.5vw, 1.7rem); }
 .tarjeta-icono {
   background: var(--papel);
   border: 2px solid var(--tinta); border-radius: var(--r);
@@ -1082,7 +1080,6 @@ noscript .nota-nojs {
    25. BREAKPOINTS  (mobile-first: 520 · 620 · 720 · 860 · 880 · 900)
    ====================================================================== */
 @media (min-width: 520px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .footer__grid { grid-template-columns: repeat(2, 1fr); }
   .franja-pedido { grid-template-columns: 1fr auto; }
 }
@@ -1101,7 +1098,6 @@ noscript .nota-nojs {
 @media (min-width: 860px) {
   .dos-col { grid-template-columns: 1.05fr .95fr; gap: clamp(2.4rem, 5vw, 4rem); }
   .dos-col--invertida { grid-template-columns: .95fr 1.05fr; }
-  .grid-4 { grid-template-columns: repeat(4, 1fr); }
   .grid-prod { grid-template-columns: repeat(3, 1fr); }
 }
 
