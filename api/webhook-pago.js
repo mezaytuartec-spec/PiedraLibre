@@ -19,6 +19,12 @@ import nodemailer from 'nodemailer';
 
 const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
+/* Mercado Pago manda varios avisos por cada pago (formato viejo y nuevo,
+   y a veces repetido). Esto evita mandar el mail dos veces por el mismo
+   pago mientras esta función siga "caliente" — no hace falta que sea
+   perfecto, sólo evitar el caso común de duplicados. */
+const pagosYaProcesados = new Set();
+
 function pesos(n) {
   return '$' + Number(n || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
 }
@@ -31,21 +37,24 @@ function armarTransporte() {
 }
 
 export default async function handler(req, res) {
-  /* Mercado Pago espera una respuesta rápida (si tarda mucho, reintenta el
-     aviso más tarde pensando que falló). Contestamos "recibido" enseguida
-     y el trabajo de mandar los mails sigue después, ya sin que Mercado
-     Pago esté esperando. */
-  res.status(200).send('ok');
-
+  /* Importante: la respuesta se manda recién al final, después de mandar
+     los mails. Antes se respondía "ok" enseguida y se seguía trabajando
+     "en segundo plano", pero en Vercel eso corta la función a mitad de
+     camino apenas se manda la respuesta — por eso no llegaba ningún mail
+     aunque el aviso de Mercado Pago sí llegaba (se veía en los logs con
+     0 pedidos salientes y menos de 25ms de duración, un pago real no se
+     consulta ni se manda un mail en ese tiempo). */
   try {
     const tipo = req.query.type || req.query.topic;
     const pagoId = req.query['data.id'] || req.query.id;
-    if (tipo !== 'payment' || !pagoId) { return; }
+    if (tipo !== 'payment' || !pagoId) { res.status(200).send('ok'); return; }
+    if (pagosYaProcesados.has(String(pagoId))) { res.status(200).send('ok'); return; }
+    pagosYaProcesados.add(String(pagoId));
 
     const payment = new Payment(client);
     const pago = await payment.get({ id: pagoId });
 
-    if (pago.status !== 'approved') { return; }
+    if (pago.status !== 'approved') { res.status(200).send('ok'); return; }
 
     const meta = pago.metadata || {};
     let items = [];
@@ -95,4 +104,5 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error('[webhook-pago] error:', err);
   }
+  res.status(200).send('ok');
 }
