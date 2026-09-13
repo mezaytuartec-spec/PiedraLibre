@@ -37,6 +37,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..800,0..100,0..1;1,9..144,400..800,0..100,0..1&family=Inter:wght@400;600&display=swap">
 
+<!-- La foto del hero es lo primero que se pinta en pantalla (LCP): se
+     adelanta la descarga acá, antes de que se termine de leer el resto
+     del HTML, en vez de esperar a que corra el JavaScript. -->
+<link rel="preload" as="image" href="assets/img/hero-principal.webp" fetchpriority="high">
+
 <link rel="stylesheet" href="styles.css?v=20260930">
 </head>
 
@@ -115,13 +120,9 @@
 
         <div class="pila reveal">
           <img class="planta-fija planta-fija--hero" src="assets/img/deco-rama-1.webp" alt="" aria-hidden="true">
-          <div class="ph ph--4x5 pila__unica" style="--tint:var(--t-fucsia)"
-               data-img="assets/img/hero-principal.webp"
-               data-alt="Nene con la remera Zorrito de las sierras haciendo burbujas al aire libre">
-            <span class="ph__tag">FOTO</span>
-            <span class="ph__nombre">Foto principal — prenda puesta, al aire libre</span>
-            <span class="ph__medida">1000 × 1250 px</span>
-            <code class="ph__ruta">assets/img/hero-principal.webp</code>
+          <div class="ph ph--4x5 ph--cargado pila__unica" style="--tint:var(--t-fucsia)">
+            <img src="assets/img/hero-principal.webp" alt="Nene con la remera Zorrito de las sierras haciendo burbujas al aire libre"
+                 width="1000" height="1250" fetchpriority="high" decoding="async">
           </div>
         </div>
 
@@ -234,13 +235,9 @@
 
         <div class="reveal foto-planta">
           <img class="planta-fija rama-fija--nosotros-foto" src="assets/img/deco-rama-2.webp" alt="" aria-hidden="true">
-          <div class="ph ph--4x5" style="--tint:var(--t-monte)"
-               data-img="assets/img/taller-costura.webp?v=2"
-               data-alt="Etiqueta de Piedra Libre sobre prendas de algodón recién estampadas">
-            <span class="ph__tag">FOTO</span>
-            <span class="ph__nombre">Taller — costura del aplique</span>
-            <span class="ph__medida">1000 × 1250 px</span>
-            <code class="ph__ruta">assets/img/taller-costura.webp</code>
+          <div class="ph ph--4x5 ph--cargado" style="--tint:var(--t-monte)">
+            <img src="assets/img/taller-costura.webp?v=2" alt="Etiqueta de Piedra Libre sobre prendas de algodón recién estampadas"
+                 width="1000" height="1250" loading="lazy" decoding="async">
           </div>
         </div>
 

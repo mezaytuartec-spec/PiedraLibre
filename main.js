@@ -165,26 +165,50 @@
      2) Placeholders de imagen
      Intenta cargar la foto real. Si existe, reemplaza el recuadro.
      Si no existe, el recuadro queda con las instrucciones a la vista.
+
+     Las fotos no se piden todas de una: se esperan a que el recuadro esté
+     cerca de la pantalla (con "IntersectionObserver"). Así una grilla con
+     muchos productos no descarga todas las fotos apenas se entra a la
+     página — sólo las que se van a ver. En navegadores muy viejos que no
+     tengan "IntersectionObserver" se cargan todas de entrada, como antes.
      ========================================================================== */
   function cargarFotos(ctx) {
-    $$('.ph[data-img]', ctx).forEach(function (ph) {
-      if (ph.getAttribute('data-probado') === '1') { return; }
-      ph.setAttribute('data-probado', '1');
+    var pendientes = $$('.ph[data-img]', ctx).filter(function (ph) {
+      return ph.getAttribute('data-probado') !== '1';
+    });
+    if (!pendientes.length) { return; }
+
+    function cargar(ph) {
       var src = ph.getAttribute('data-img');
       if (!src) { return; }
-      var probe = new Image();
-      probe.onload = function () {
-        if (!probe.naturalWidth) { return; }
-        var img = document.createElement('img');
-        img.src = src;
-        img.alt = ph.getAttribute('data-alt') || '';
-        img.loading = 'lazy';
-        img.decoding = 'async';
+      var img = new Image();
+      img.alt = ph.getAttribute('data-alt') || '';
+      img.decoding = 'async';
+      img.onload = function () {
+        if (!img.naturalWidth) { return; }
         ph.innerHTML = '';
         ph.appendChild(img);
         ph.classList.add('ph--cargado');
       };
-      probe.src = src;
+      img.src = src;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      pendientes.forEach(function (ph) { ph.setAttribute('data-probado', '1'); cargar(ph); });
+      return;
+    }
+
+    var observador = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (!entrada.isIntersecting) { return; }
+        observador.unobserve(entrada.target);
+        cargar(entrada.target);
+      });
+    }, { rootMargin: '600px 0px' });
+
+    pendientes.forEach(function (ph) {
+      ph.setAttribute('data-probado', '1');
+      observador.observe(ph);
     });
   }
 

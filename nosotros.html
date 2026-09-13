@@ -33,6 +33,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..800,0..100,0..1;1,9..144,400..800,0..100,0..1&family=Inter:wght@400;600&display=swap">
 
+<!-- El banner de arriba es lo primero que se pinta en pantalla (LCP):
+     se adelanta la descarga acá en vez de esperar al JavaScript. -->
+<link rel="preload" as="image" href="assets/img/nosotros-banner.webp" fetchpriority="high">
+
 <link rel="stylesheet" href="styles.css?v=20260930">
 </head>
 
@@ -87,13 +91,9 @@
       <p class="bajada">Piedra Libre no es una tienda que compra y revende. Es un taller. Todo lo que ves en la web salió de una mesa de corte y de una máquina de coser en Los Molles.</p>
 
       <div class="banner-ancho reveal">
-        <div class="ph ph--16x9" style="--tint:var(--t-zorro)"
-             data-img="assets/img/nosotros-banner.webp"
-             data-alt="Cuatro chicos con remeras y shorts de Piedra Libre, sentados sobre un tronco en el monte">
-          <span class="ph__tag">FOTO</span>
-          <span class="ph__nombre">Banner — chicos con las prendas puestas, al aire libre</span>
-          <span class="ph__medida">1600 × 900 px</span>
-          <code class="ph__ruta">assets/img/nosotros-banner.webp</code>
+        <div class="ph ph--16x9 ph--cargado" style="--tint:var(--t-zorro)">
+          <img src="assets/img/nosotros-banner.webp" alt="Cuatro chicos con remeras y shorts de Piedra Libre, sentados sobre un tronco en el monte"
+               width="1600" height="900" fetchpriority="high" decoding="async">
         </div>
       </div>
     </div>
@@ -119,13 +119,9 @@
 
         <div class="reveal foto-planta">
           <img class="planta-fija aloe-fija--historia" src="assets/img/deco-aloe-1.webp" alt="" aria-hidden="true">
-          <div class="ph ph--4x5" style="--tint:var(--t-fucsia)"
-               data-img="assets/img/fachada-local.webp"
-               data-alt="Mapi doblando una remera en el taller, con los moldes de cartón colgados en la pared">
-            <span class="ph__tag">FOTO</span>
-            <span class="ph__nombre">Mapi en el taller</span>
-            <span class="ph__medida">1000 × 1250 px</span>
-            <code class="ph__ruta">assets/img/fachada-local.webp</code>
+          <div class="ph ph--4x5 ph--cargado" style="--tint:var(--t-fucsia)">
+            <img src="assets/img/fachada-local.webp" alt="Mapi doblando una remera en el taller, con los moldes de cartón colgados en la pared"
+                 width="1000" height="1250" loading="lazy" decoding="async">
           </div>
         </div>
 
@@ -140,13 +136,9 @@
 
         <div class="reveal foto-planta">
           <img class="planta-fija aloe-fija--materiales" src="assets/img/deco-aloe-2.webp" alt="" aria-hidden="true">
-          <div class="ph ph--auto" style="--tint:var(--t-monte)"
-               data-img="assets/img/materiales-telas.webp?v=2"
-               data-alt="Nena con gorro de algodón estampado con gatitos, de Piedra Libre">
-            <span class="ph__tag">FOTO</span>
-            <span class="ph__nombre">Detalle de la tela estampada</span>
-            <span class="ph__medida">800 × 1203 px, sin recortar</span>
-            <code class="ph__ruta">assets/img/materiales-telas.webp</code>
+          <div class="ph ph--auto ph--cargado" style="--tint:var(--t-monte)">
+            <img src="assets/img/materiales-telas.webp?v=2" alt="Nena con gorro de algodón estampado con gatitos, de Piedra Libre"
+                 width="800" height="1203" loading="lazy" decoding="async">
           </div>
         </div>
 
@@ -192,13 +184,9 @@
 
         <div class="reveal zona-img foto-planta">
           <img class="planta-fija aloe-fija--zona-foto" src="assets/img/deco-aloe-3.webp" alt="" aria-hidden="true">
-          <div class="ph ph--4x5" style="--tint:var(--t-violeta)"
-               data-img="assets/img/sierras-comechingones.webp"
-               data-alt="Nene con la capucha puesta del chaleco Piedra Libre, entre las pencas de las sierras">
-            <span class="ph__tag">FOTO</span>
-            <span class="ph__nombre">Con la capucha puesta, en las sierras</span>
-            <span class="ph__medida">1000 × 1250 px</span>
-            <code class="ph__ruta">assets/img/sierras-comechingones.webp</code>
+          <div class="ph ph--4x5 ph--cargado" style="--tint:var(--t-violeta)">
+            <img src="assets/img/sierras-comechingones.webp" alt="Nene con la capucha puesta del chaleco Piedra Libre, entre las pencas de las sierras"
+                 width="1000" height="1250" loading="lazy" decoding="async">
           </div>
         </div>
 
